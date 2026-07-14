@@ -9,6 +9,7 @@
             --bg-gif: url('https://i.pinimg.com/originals/10/ff/4f/10ff4f98a494e390e07b1a0e9eefa4be.gif');
             --card-bg: rgba(15, 15, 15, 0.4); 
             --text-main: #FFFFFF;
+            --neon-glow: #ffffff; /* Цвет свечения полосы */
         }
 
         * {
@@ -52,10 +53,9 @@
             max-width: 450px;
             text-align: center;
             z-index: 10;
-            padding-bottom: 60px; /* Компенсация убранного футера для баланса */
+            padding-bottom: 60px;
         }
 
-        /* Подняли заголовок выше */
         .profile {
             margin-bottom: 60px; 
         }
@@ -77,20 +77,19 @@
         .links-group {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 18px;
         }
 
         /* Контейнер кнопки */
         .link-wrapper {
             position: relative;
             width: 100%;
-            height: 60px; /* Фиксированная высота для точного расчета SVG */
+            height: 60px; 
             display: block;
             text-decoration: none;
-            overflow: hidden;
         }
 
-        /* SVG слой, который рисует ровную обводку */
+        /* Адаптивный SVG слой с мощным неоновым свечением */
         .border-svg {
             position: absolute;
             top: 0;
@@ -98,18 +97,21 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
+            /* Мощный неоновый фильтр для всей линии */
+            filter: drop-shadow(0 0 4px var(--neon-glow)) drop-shadow(0 0 12px var(--neon-glow));
         }
 
         .border-rect {
-            width: 100%;
-            height: 100%;
+            x: 1px;
+            y: 1px;
+            width: calc(100% - 2px);
+            height: calc(100% - 2px);
             fill: none;
             stroke: #ffffff;
-            stroke-width: 2;
-            /* Длина штриха и пробела (настраивает длину бегающей линии) */
-            stroke-dasharray: 80 400; 
-            /* Бесконечная супер-плавная анимация бега линии */
-            animation: run-border 4s linear infinite;
+            stroke-width: 2px;
+            /* stroke-dasharray выставлен так, чтобы на экране была строго одна линия */
+            stroke-dasharray: 120 1000; 
+            animation: run-border 3s linear infinite;
         }
 
         @keyframes run-border {
@@ -117,15 +119,16 @@
                 stroke-dashoffset: 0;
             }
             to {
-                stroke-dashoffset: -480; /* Длина полного периметра кнопки */
+                stroke-dashoffset: -1020; /* Полный круг прохода одной линии */
             }
         }
 
-        /* Сама кнопка внутри обводки */
+        /* Сама квадратная прозрачная кнопка */
         .link-card {
             width: 100%;
             height: 100%;
             background-color: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Легкий контур, пока линия не добежала */
             color: var(--text-main);
             font-size: 16px;
             text-transform: uppercase;
@@ -141,12 +144,12 @@
         .link-wrapper:hover .link-card {
             background-color: #ffffff;
             color: #000000;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
         }
 
         .link-wrapper:hover .border-rect {
-            stroke: #ffffff;
-            animation: run-border 1.5s linear infinite; /* При наведении бежит быстрее */
-            stroke-dasharray: 150 330; /* Линия становится длиннее при ховере */
+            animation: run-border 1.2s linear infinite; /* Ускорение при наведении */
+            stroke-dasharray: 200 1000; /* Линия становится чуть длиннее при ховере */
         }
     </style>
 </head>
@@ -161,7 +164,6 @@
         </div>
 
         <div class="links-group">
-            <!-- Шаблон кнопки с SVG обводкой -->
             <a href="https://t.me" target="_blank" class="link-wrapper">
                 <svg class="border-svg"><rect class="border-rect"></rect></svg>
                 <div class="link-card">Telegram Channel</div>
