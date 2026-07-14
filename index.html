@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oder</title>
+    <title>Oder24hz</title>
     <style>
         :root {
-            /* Замени ССЫЛКА_НА_ТВОЮ_ГИФКУ.gif на реальный URL своей гифки */
-            --bg-gif: url('https://i.pinimg.com/originals/7a/63/d4/7a63d4c91a83613b8088c9cde3f3ceaf.gif');
+            /* Ссылка на GIF-анимацию заднего фона */
+            --bg-gif: url('https://i.pinimg.com/originals/10/ff/4f/10ff4f98a494e390e07b1a0e9eefa4be.gif');
             --card-bg: rgba(22, 22, 22, 0.85);
             --card-border: #333333;
             --card-hover: #ffffff;
@@ -18,14 +18,14 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            cursor: none; /* Скрываем стандартный курсор для кастомной линии */
+            cursor: none; /* Скрываем стандартный курсор для шлейфа */
         }
 
         body {
             background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), var(--bg-gif) center/cover no-repeat fixed;
             color: var(--text-main);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            font-weight: 800; /* Жирный шрифт для всего сайта */
+            font-weight: 800; /* Жирный шрифт */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -47,7 +47,7 @@
             z-index: 9999;
             transform: translate(-50%, -50%);
             box-shadow: 0 0 15px #ffffff, 0 0 30px #ffffff;
-            transition: transform 0.08s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: transform 0.1s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .container {
@@ -61,21 +61,24 @@
             margin-bottom: 35px;
         }
 
-        /* Анимированное неоновое свечение текста */
+        /* Ультра-плавное анимированное свечение текста */
         .profile h1 {
             font-size: 38px;
             letter-spacing: -1px;
             text-transform: uppercase;
             color: #fff;
-            animation: glow 2s ease-in-out infinite alternate;
+            animation: glow 4s ease-in-out infinite alternate; /* Время увеличено для плавности */
         }
 
         @keyframes glow {
-            from {
-                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #333;
+            0% {
+                text-shadow: 0 0 4px rgba(255,255,255,0.6), 0 0 8px rgba(255,255,255,0.4);
             }
-            to {
-                text-shadow: 0 0 15px #fff, 0 0 25px #ffffff, 0 0 35px #555;
+            50% {
+                text-shadow: 0 0 15px rgba(255,255,255,0.9), 0 0 25px rgba(255,255,255,0.7), 0 0 35px rgba(255,255,255,0.5);
+            }
+            100% {
+                text-shadow: 0 0 8px rgba(255,255,255,0.7), 0 0 12px rgba(255,255,255,0.5);
             }
         }
 
@@ -89,7 +92,7 @@
         .link-card {
             background-color: var(--card-bg);
             border: 2px solid var(--card-border);
-            border-radius: 0px; /* Скругление убрано — кнопки квадратные */
+            border-radius: 0px; 
             padding: 18px 24px;
             color: var(--text-main);
             text-decoration: none;
@@ -131,7 +134,7 @@
     <div class="container">
         
         <div class="profile">
-            <h1>ODER</h1>
+            <h1>Oder24hz</h1>
         </div>
 
         <div class="links-group">
@@ -172,7 +175,7 @@
     </div>
 
     <script>
-        // Скрипт плавного следования линии (точки) за курсором
+        // Скрипт плавного следования точки за курсором
         const trail = document.getElementById('cursor-trail');
         window.addEventListener('mousemove', (e) => {
             trail.style.left = e.clientX + 'px';
