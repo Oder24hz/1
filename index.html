@@ -7,7 +7,7 @@
     <style>
         :root {
             --bg-gif: url('https://i.pinimg.com/originals/10/ff/4f/10ff4f98a494e390e07b1a0e9eefa4be.gif');
-            --card-bg: rgba(15, 15, 15, 0.4); /* Кнопки стали значительно прозрачнее */
+            --card-bg: rgba(15, 15, 15, 0.4); 
             --text-main: #FFFFFF;
         }
 
@@ -31,6 +31,7 @@
             overflow-x: hidden;
         }
 
+        /* Точка за курсором */
         #cursor-trail {
             position: fixed;
             top: 0;
@@ -43,7 +44,7 @@
             z-index: 9999;
             transform: translate(-50%, -50%);
             box-shadow: 0 0 15px #ffffff, 0 0 30px #ffffff;
-            transition: transform 0.1s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: transform 0.08s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .container {
@@ -51,10 +52,12 @@
             max-width: 450px;
             text-align: center;
             z-index: 10;
+            padding-bottom: 60px; /* Компенсация убранного футера для баланса */
         }
 
+        /* Подняли заголовок выше */
         .profile {
-            margin-bottom: 40px;
+            margin-bottom: 60px; 
         }
 
         .profile h1 {
@@ -67,77 +70,83 @@
 
         @keyframes glow {
             0% { text-shadow: 0 0 4px rgba(255,255,255,0.6), 0 0 8px rgba(255,255,255,0.4); }
-            50% { text-shadow: 0 0 15px rgba(255,255,255,0.9), 0 0 25px rgba(255,255,255,0.7), 0 0 35px rgba(255,255,255,0.5); }
+            50% { text-shadow: 0 0 15px rgba(255,255,255,0.9), 0 0 25px rgba(255,255,255,0.7); }
             100% { text-shadow: 0 0 8px rgba(255,255,255,0.7), 0 0 12px rgba(255,255,255,0.5); }
         }
 
         .links-group {
             display: flex;
             flex-direction: column;
-            gap: 20px; /* Увеличил отступ, чтобы светящиеся границы не сливались */
+            gap: 16px;
         }
 
-        /* Контейнер для эффекта бегающей обводки */
+        /* Контейнер кнопки */
         .link-wrapper {
             position: relative;
-            padding: 2px; /* Толщина бегающей линии */
-            overflow: hidden;
+            width: 100%;
+            height: 60px; /* Фиксированная высота для точного расчета SVG */
             display: block;
             text-decoration: none;
+            overflow: hidden;
         }
 
-        /* Задний фон-градиент, который крутится и создает эффект бегающего огонька */
-        .link-wrapper::before {
-            content: '';
+        /* SVG слой, который рисует ровную обводку */
+        .border-svg {
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(transparent, transparent, transparent, #ffffff);
-            animation: rotate-border 6s linear infinite; /* Медленное и плавное вращение */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
         }
 
-        @keyframes rotate-border {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .border-rect {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 2;
+            /* Длина штриха и пробела (настраивает длину бегающей линии) */
+            stroke-dasharray: 80 400; 
+            /* Бесконечная супер-плавная анимация бега линии */
+            animation: run-border 4s linear infinite;
+        }
+
+        @keyframes run-border {
+            from {
+                stroke-dashoffset: 0;
+            }
+            to {
+                stroke-dashoffset: -480; /* Длина полного периметра кнопки */
+            }
         }
 
         /* Сама кнопка внутри обводки */
         .link-card {
-            position: relative;
+            width: 100%;
+            height: 100%;
             background-color: var(--card-bg);
-            padding: 18px 24px;
             color: var(--text-main);
             font-size: 16px;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
             display: flex;
-            justify-content: center; /* Текст строго по центру */
+            justify-content: center; 
             align-items: center;
             backdrop-filter: blur(8px);
-            z-index: 1;
-            height: 100%;
-            width: 100%;
         }
 
-        /* Эффект при наведении */
+        /* Эффект наведения */
         .link-wrapper:hover .link-card {
             background-color: #ffffff;
             color: #000000;
         }
-        
-        .link-wrapper:hover::before {
-            background: conic-gradient(transparent, transparent, #ffffff, #ffffff);
-            animation: rotate-border 2s linear infinite; /* При наведении линия бегает быстрее */
-        }
 
-        .footer {
-            margin-top: 60px;
-            font-size: 12px;
-            letter-spacing: 2px;
-            opacity: 0.5;
+        .link-wrapper:hover .border-rect {
+            stroke: #ffffff;
+            animation: run-border 1.5s linear infinite; /* При наведении бежит быстрее */
+            stroke-dasharray: 150 330; /* Линия становится длиннее при ховере */
         }
     </style>
 </head>
@@ -152,31 +161,41 @@
         </div>
 
         <div class="links-group">
+            <!-- Шаблон кнопки с SVG обводкой -->
             <a href="https://t.me" target="_blank" class="link-wrapper">
+                <svg class="border-svg"><rect class="border-rect"></rect></svg>
                 <div class="link-card">Telegram Channel</div>
             </a>
+            
             <a href="https://t.me" target="_blank" class="link-wrapper">
+                <svg class="border-svg"><rect class="border-rect"></rect></svg>
                 <div class="link-card">Telegram RealLife</div>
             </a>
+            
             <a href="https://twitch.tv" target="_blank" class="link-wrapper">
+                <svg class="border-svg"><rect class="border-rect"></rect></svg>
                 <div class="link-card">Twitch</div>
             </a>
+            
             <a href="https://youtube.com" target="_blank" class="link-wrapper">
+                <svg class="border-svg"><rect class="border-rect"></rect></svg>
                 <div class="link-card">Youtube</div>
             </a>
+            
             <a href="https://discord.gg" target="_blank" class="link-wrapper">
+                <svg class="border-svg"><rect class="border-rect"></rect></svg>
                 <div class="link-card">Discord</div>
             </a>
+            
             <a href="https://t.me" target="_blank" class="link-wrapper">
+                <svg class="border-svg"><rect class="border-rect"></rect></svg>
                 <div class="link-card">Reviews</div>
             </a>
+            
             <a href="https://t.me" target="_blank" class="link-wrapper">
+                <svg class="border-svg"><rect class="border-rect"></rect></svg>
                 <div class="link-card">Contact Account</div>
             </a>
-        </div>
-
-        <div class="footer">
-            ODER &copy; 2026
         </div>
 
     </div>
