@@ -3,133 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oder | Links</title>
+    <title>Oder</title>
     <style>
         :root {
-            --bg-color: #0B0B0B;
-            --card-bg: #161616;
-            --card-border: #222222;
-            --card-hover: #2A2A2A;
+            /* Замени ССЫЛКА_НА_ТВОЮ_ГИФКУ.gif на реальный URL своей гифки */
+            --bg-gif: url('https://i.pinimg.com/originals/7a/63/d4/7a63d4c91a83613b8088c9cde3f3ceaf.gif');
+            --card-bg: rgba(22, 22, 22, 0.85);
+            --card-border: #333333;
+            --card-hover: #ffffff;
             --text-main: #FFFFFF;
-            --text-muted: #888888;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            cursor: none; /* Скрываем стандартный курсор для кастомной линии */
         }
 
         body {
-            background-color: var(--bg-color);
+            background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), var(--bg-gif) center/cover no-repeat fixed;
             color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            font-weight: 800; /* Жирный шрифт для всего сайта */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Элемент шлейфа за курсором */
+        #cursor-trail {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            background: #ffffff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px #ffffff, 0 0 30px #ffffff;
+            transition: transform 0.08s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 450px;
             text-align: center;
+            z-index: 10;
         }
 
         .profile {
-            margin-bottom: 32px;
+            margin-bottom: 35px;
         }
 
+        /* Анимированное неоновое свечение текста */
         .profile h1 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
+            font-size: 38px;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+            color: #fff;
+            animation: glow 2s ease-in-out infinite alternate;
         }
 
-        .profile p {
-            color: var(--text-muted);
-            font-size: 14px;
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #333;
+            }
+            to {
+                text-shadow: 0 0 15px #fff, 0 0 25px #ffffff, 0 0 35px #555;
+            }
         }
 
         .links-group {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
         }
 
+        /* Полностью квадратные кнопки */
         .link-card {
             background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 16px;
+            border: 2px solid var(--card-border);
+            border-radius: 0px; /* Скругление убрано — кнопки квадратные */
+            padding: 18px 24px;
             color: var(--text-main);
             text-decoration: none;
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             transition: all 0.2s ease;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            backdrop-filter: blur(5px);
         }
 
         .link-card:hover {
             background-color: var(--card-hover);
-            border-color: #444444;
-            transform: translateY(-1px);
+            color: #000000;
+            border-color: var(--card-hover);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+            transform: scale(1.02);
         }
 
         .link-card span:last-child {
-            color: var(--text-muted);
-            font-size: 12px;
-            font-weight: 400;
+            font-size: 14px;
         }
 
         .footer {
-            margin-top: 40px;
-            font-size: 11px;
-            color: var(--text-muted);
-            letter-spacing: 1px;
+            margin-top: 50px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
 
+    <!-- Слой для эффекта следования за курсором -->
+    <div id="cursor-trail"></div>
+
     <div class="container">
         
         <div class="profile">
-            <h1>@Oder</h1>
-            <p>Optimization & Content Creation</p>
+            <h1>ODER</h1>
         </div>
 
         <div class="links-group">
-            <a href="https://t.me/Oderrr" target="_blank" class="link-card">
+            <a href="https://t.me" target="_blank" class="link-card">
                 <span>Telegram Channel</span>
                 <span>→</span>
             </a>
-            <a href="https://t.me/OderRealLife" target="_blank" class="link-card">
+            <a href="https://t.me" target="_blank" class="link-card">
                 <span>Telegram RealLife</span>
                 <span>→</span>
             </a>
-            <a href="https://www.twitch.tv/oder24hz" target="_blank" class="link-card">
-                <span>Twitch Stream</span>
+            <a href="https://twitch.tv" target="_blank" class="link-card">
+                <span>Twitch</span>
                 <span>→</span>
             </a>
-            <a href="https://www.youtube.com/@Oder24hz" target="_blank" class="link-card">
-                <span>YouTube Channel</span>
+            <a href="https://youtube.com" target="_blank" class="link-card">
+                <span>Youtube</span>
                 <span>→</span>
             </a>
-            <a href="https://discord.gg/pMc7SFH8qX" target="_blank" class="link-card">
-                <span>Discord Server</span>
+            <a href="https://discord.gg" target="_blank" class="link-card">
+                <span>Discord</span>
                 <span>→</span>
             </a>
-            <a href="https://t.me/Oder_optim" target="_blank" class="link-card">
-                <span>Reviews (Отзывы)</span>
+            <a href="https://t.me" target="_blank" class="link-card">
+                <span>Reviews</span>
                 <span>→</span>
             </a>
-            <a href="https://t.me/OderOptimization" target="_blank" class="link-card">
-                <span>Contact (Заказ услуг)</span>
+            <a href="https://t.me" target="_blank" class="link-card">
+                <span>Contact Account</span>
                 <span>→</span>
             </a>
         </div>
@@ -140,5 +171,13 @@
 
     </div>
 
+    <script>
+        // Скрипт плавного следования линии (точки) за курсором
+        const trail = document.getElementById('cursor-trail');
+        window.addEventListener('mousemove', (e) => {
+            trail.style.left = e.clientX + 'px';
+            trail.style.top = e.clientY + 'px';
+        });
+    </script>
 </body>
 </html>
