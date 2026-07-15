@@ -17,50 +17,56 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            cursor: none !important; /* Убираем дефолтный курсор */
+            cursor: none !important; /* Намертво прячем стандартную мышь */
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
-            user-select: none; /* Блокировка выделения */
+            user-select: none; /* Запрет на выделение текста */
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), var(--bg-gif) center/cover no-repeat fixed;
         }
 
         body {
-            background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), var(--bg-gif) center/cover no-repeat fixed;
             color: var(--text-main);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             font-weight: 800;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             padding: 20px;
-            overflow: hidden;
         }
 
-        /* Жесткий фикс контейнера кастомного курсора */
+        /* ПОЛНЫЙ ЖЕСТКИЙ ФИКС ВИДИМОСТИ КУРСОРA */
         #trail-container {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             pointer-events: none;
-            z-index: 999999;
+            z-index: 99999999 !important; /* Курсор выше абсолютно всего на странице */
+            isolation: isolate; /* Защита от багов с backdrop-filter */
         }
 
-        /* Четкие физические параметры для точек шлейфа */
         .cursor-dot {
             position: fixed;
             top: 0;
             left: 0;
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             background-color: #ffffff !important;
             border-radius: 50%;
             pointer-events: none;
             box-shadow: 0 0 15px #ffffff, 0 0 30px #ffffff;
-            will-change: transform;
+            will-change: left, top;
             transform: translate(-50%, -50%);
+            z-index: 99999999 !important;
+            mix-blend-mode: difference; /* Инверсия цвета, чтобы его было видно на любых фонах */
         }
 
         .container {
@@ -208,14 +214,13 @@
             let targetY = mouse.y;
 
             dots.forEach((dot, index) => {
-                dot.x += (targetX - dot.x) * 0.3;
-                dot.y += (targetY - dot.y) * 0.3;
+                dot.x += (targetX - dot.x) * 0.25;
+                dot.y += (targetY - dot.y) * 0.25;
                 
-                // Исправленный метод позиционирования через левые/верхние отступы для 100% совместимости
                 dot.element.style.left = dot.x + 'px';
                 dot.element.style.top = dot.y + 'px';
                 dot.element.style.opacity = (1 - (index / dotsCount)).toFixed(2);
-                dot.element.style.transform = `translate(-50%, -50%) scale(${(1 - (index / dotsCount) * 0.5).toFixed(2)})`;
+                dot.element.style.transform = `translate(-50%, -50%) scale(${(1 - (index / dotsCount) * 0.4).toFixed(2)})`;
                 
                 targetX = dot.x;
                 targetY = dot.y;
@@ -225,7 +230,7 @@
         }
         animateDots();
 
-        // 3. ИНТЕРАКТИВНОЕ ЖЕЛЕ НА ЗАГОЛОВКЕ (DRAG + SPRING)
+        // 3. ЖЕЛЕ-ЗАГОЛОВОК (DRAG + SPRING)
         const dragTitle = document.getElementById('drag-title');
         let isDragging = false;
         let startMouseX = 0, startMouseY = 0;
@@ -282,6 +287,3 @@
         }
         updatePhysics();
 
-        // 4. ЖЕЛЕ ДЛЯ КНОПОК ПРИ УХОДЕ КУРСОРA
-        const cards = document.querySelectorAll('.link-card');
-        cards.forEach(card => {
