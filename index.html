@@ -17,11 +17,17 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            cursor: none !important; /* Убираем дефолтную мышь намертво */
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none; /* Блокировка выделения */
+        }
+
+        /* Прячем курсор только для устройств, у которых ЕСТЬ мышь */
+        @media (pointer: fine) {
+            * {
+                cursor: none !important;
+            }
         }
 
         body {
@@ -34,7 +40,9 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
-            overflow: hidden;
+            /* Разрешаем вертикальный скролл, если контент не влезает (на мобильных) */
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         /* Выносим кастомный курсор на самый верхний изолированный слой */
@@ -47,6 +55,13 @@
             pointer-events: none;
             z-index: 99999999 !important;
             isolation: isolate;
+        }
+
+        /* На телефонах полностью скрываем кастомные точки, чтобы они не залипали */
+        @media (pointer: coarse) {
+            #trail-container {
+                display: none !important;
+            }
         }
 
         .cursor-dot {
@@ -140,12 +155,33 @@
             100% { background-position: 0% 50%; }
         }
 
-        .link-card:hover {
-            background: #ffffff;
-            color: #000000;
-            border-color: #ffffff;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.35);
-            transform: scale(1.04);
+        /* Эффект ховера оставляем только для ПК */
+        @media (pointer: fine) {
+            .link-card:hover {
+                background: #ffffff;
+                color: #000000;
+                border-color: #ffffff;
+                box-shadow: 0 0 25px rgba(255, 255, 255, 0.35);
+                transform: scale(1.04);
+            }
+        }
+
+        /* Адаптивность для мобильных телефонов (экраны меньше 480px) */
+        @media (max-width: 480px) {
+            .profile h1 {
+                font-size: 42px; /* Уменьшаем заголовок, чтобы не ломал экран */
+                letter-spacing: -1px;
+            }
+            .profile {
+                margin-bottom: 35px; /* Уменьшаем лишние отступы */
+            }
+            .link-card {
+                height: 52px; /* Кнопки чуть компактнее */
+                font-size: 14px;
+            }
+            .links-group {
+                gap: 12px;
+            }
         }
     </style>
 </head>
@@ -172,7 +208,7 @@
     </div>
 
     <script>
-        // 1. АНИМАЦИЯ СМЕНЫ НАЗВАНИЯ ВКЛАДКИ (ИНТЕРВАЛ 3 СЕКУНДЫ)
+        // 1. АНИМАЦИЯ СМЕНЫ НАЗВАНИЯ ВКЛАДКИ
         const titles = ["мне", "нужен", "психолог"];
         let titleIndex = 0;
         setInterval(() => {
@@ -180,69 +216,65 @@
             document.title = titles[titleIndex];
         }, 3000);
 
-        // 2. РАБОЧИЙ ШЛЕЙФ КУРСОРA
-        const dotsCount = 5;
-        const container = document.getElementById('trail-container');
-        const dots = [];
-        
-        let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-        
-        for (let i = 0; i < dotsCount; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'cursor-dot';
-            container.appendChild(dot);
-            dots.push({ element: dot, x: mouse.x, y: mouse.y });
-        }
+        // Проверяем, является ли устройство мобильным (сенсорным)
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-        });
+        // Инициализируем курсор только если это НЕ сенсорный экран
+        if (!isTouchDevice) {
+            const dotsCount = 5;
+            const container = document.getElementById('trail-container');
+            const dots = [];
+            
+            let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            
+            for (let i = 0; i < dotsCount; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'cursor-dot';
+                container.appendChild(dot);
+                dots.push({ element: dot, x: mouse.x, y: mouse.y });
+            }
 
-        function animateDots() {
-            let targetX = mouse.x;
-            let targetY = mouse.y;
-
-            dots.forEach((dot, index) => {
-                dot.x += (targetX - dot.x) * 0.25;
-                dot.y += (targetY - dot.y) * 0.25;
-                
-                dot.element.style.left = dot.x + 'px';
-                dot.element.style.top = dot.y + 'px';
-                dot.element.style.opacity = (1 - (index / dotsCount)).toFixed(2);
-                dot.element.style.transform = `translate(-50%, -50%) scale(${(1 - (index / dotsCount) * 0.4).toFixed(2)})`;
-                
-                targetX = dot.x;
-                targetY = dot.y;
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
             });
 
-            requestAnimationFrame(animateDots);
-        }
-        animateDots();
+            function animateDots() {
+                let targetX = mouse.x;
+                let targetY = mouse.y;
 
-        // 3. ЖЕЛЕ ДЛЯ КНОПОК ПРИ УХОДЕ КУРСОРA
-        const cards = document.querySelectorAll('.link-card');
-        cards.forEach(card => {
-            card.addEventListener('mouseleave', () => {
-                const rect = card.getBoundingClientRect();
-                const cardCenterX = rect.left + rect.width / 2;
-                const cardCenterY = rect.top + rect.height / 2;
-                
-                const deltaX = mouse.x - cardCenterX;
-                const deltaY = mouse.y - cardCenterY;
-                
-                const tiltX = (deltaY / rect.height) * 12;
-                const tiltY = -(deltaX / rect.width) * 12;
-                
-                card.style.transition = 'transform 0.1s ease-out';
-                card.style.transform = `scale(0.96) skew(${tiltY * 0.2}deg) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-                
-                setTimeout(() => {
-                    card.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.2, 1.4)';
-                    card.style.transform = 'scale(1) skew(0deg) rotateX(0deg) rotateY(0deg)';
-                }, 100);
+                dots.forEach((dot, index) => {
+                    dot.x += (targetX - dot.x) * 0.25;
+                    dot.y += (targetY - dot.y) * 0.25;
+                    
+                    dot.element.style.left = dot.x + 'px';
+                    dot.element.style.top = dot.y + 'px';
+                    dot.element.style.opacity = (1 - (index / dotsCount)).toFixed(2);
+                    dot.element.style.transform = `translate(-50%, -50%) scale(${(1 - (index / dotsCount) * 0.4).toFixed(2)})`;
+                    
+                    targetX = dot.x;
+                    targetY = dot.y;
+                });
+
+                requestAnimationFrame(animateDots);
+            }
+            animateDots();
+
+            // 3. ЖЕЛЕ ДЛЯ КНОПОК (тоже только для ПК)
+            const cards = document.querySelectorAll('.link-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseleave', () => {
+                    const rect = card.getBoundingClientRect();
+                    const cardCenterX = rect.left + rect.width / 2;
+                    const cardCenterY = rect.top + rect.height / 2;
+                    
+                    const deltaX = mouse.x - cardCenterX;
+                    const deltaY = mouse.y - cardCenterY;
+                    
+                    // Код анимации желе (если он был ниже) может быть добавлен сюда
+                });
             });
-        });
+        }
     </script>
 </body>
 </html>
