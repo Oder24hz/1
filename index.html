@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oder24hz</title>
+    <!-- Подключаем ультра-жирный футуристичный шрифт для заголовка -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Syne:wght@800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-gif: url('https://i.pinimg.com/originals/10/ff/4f/10ff4f98a494e390e07b1a0e9eefa4be.gif');
@@ -58,18 +62,40 @@
             margin-bottom: 60px; 
         }
 
+        /* Огромный стеклянный заголовок с новым шрифтом */
         .profile h1 {
-            font-size: 38px;
-            letter-spacing: -1px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 900; /* Максимальная жирность */
+            font-size: 54px; /* Увеличенный размер */
+            letter-spacing: -2px;
             text-transform: uppercase;
-            color: #fff;
-            animation: glow 4s ease-in-out infinite alternate;
+            
+            /* Эффект матового стекла на тексте */
+            color: rgba(255, 255, 255, 0.85);
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3); /* Тонкий стеклянный контур */
+            
+            /* Плавное покачивание стеклянного блика */
+            animation: glass-glow 4s ease-in-out infinite alternate;
         }
 
-        @keyframes glow {
-            0% { text-shadow: 0 0 4px rgba(255,255,255,0.6), 0 0 8px rgba(255,255,255,0.4); }
-            50% { text-shadow: 0 0 15px rgba(255,255,255,0.9), 0 0 25px rgba(255,255,255,0.7); }
-            100% { text-shadow: 0 0 8px rgba(255,255,255,0.7), 0 0 12px rgba(255,255,255,0.5); }
+        @keyframes glass-glow {
+            0% { 
+                text-shadow: 
+                    0 0 4px rgba(255,255,255,0.2), 
+                    0 4px 12px rgba(0,0,0,0.5); 
+            }
+            50% { 
+                text-shadow: 
+                    0 0 15px rgba(255,255,255,0.6), 
+                    0 0 25px rgba(255,255,255,0.3),
+                    0 8px 24px rgba(0,0,0,0.7); 
+                color: rgba(255, 255, 255, 0.95);
+            }
+            100% { 
+                text-shadow: 
+                    0 0 8px rgba(255,255,255,0.3), 
+                    0 4px 16px rgba(0,0,0,0.6); 
+            }
         }
 
         .links-group {
@@ -78,7 +104,6 @@
             gap: 18px;
         }
 
-        /* Полностью квадратная кнопка с ИИ-переливом фона */
         .link-card {
             width: 100%;
             height: 60px;
@@ -90,33 +115,25 @@
             font-size: 16px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            
-            /* Тонкая стильная граница */
             border: 1px solid rgba(255, 255, 255, 0.12);
             
-            /* Живой переливающийся градиент за счет увеличения размера фона в 2 раза */
             background: linear-gradient(135deg, 
                 rgba(20, 20, 20, 0.5) 0%, 
                 rgba(45, 45, 45, 0.4) 50%, 
                 rgba(20, 20, 20, 0.5) 100%
             );
             background-size: 200% 200%;
-            
-            /* Супер-плавное бесконечное движение волны */
             animation: wave-shift 6s ease infinite;
-            
             backdrop-filter: blur(8px);
             transition: all 0.4s ease;
         }
 
-        /* Плавная анимация движения жидкого градиента */
         @keyframes wave-shift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
 
-        /* Мягкая и стильная реакция на ховер */
         .link-card:hover {
             background: #ffffff;
             color: #000000;
@@ -141,7 +158,7 @@
             <a href="https://t.me" target="_blank" class="link-card">Telegram RealLife</a>
             <a href="https://twitch.tv" target="_blank" class="link-card">Twitch</a>
             <a href="https://youtube.com" target="_blank" class="link-card">Youtube</a>
-            <a href="https://discord.gg" target="_blank" class="link-card">Discord</a>
+            <a href="https://discord.gg" class="link-card">Discord</a>
             <a href="https://t.me" target="_blank" class="link-card">Reviews</a>
             <a href="https://t.me" target="_blank" class="link-card">Contact Account</a>
         </div>
