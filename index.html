@@ -9,7 +9,7 @@
     <link href="https://googleapis.com/css2?family=Unbounded:wght@900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-gif: url('https://i.pinimg.com/originals/31/f0/cb/31f0cbbfe52091e54b2f8157ebd60a8f.gif');
+            --bg-gif: url('https://giphy.com');
             --text-main: #FFFFFF;
         }
 
@@ -17,11 +17,11 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            cursor: none !important; /* Убираем дефолтную стрелку */
+            cursor: none !important; /* Убираем дефолтный курсор */
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
-            user-select: none; /* Запрет выделения текста */
+            user-select: none; /* Блокировка выделения */
         }
 
         body {
@@ -37,31 +37,30 @@
             overflow: hidden;
         }
 
-        /* Контейнер кастомного курсора */
+        /* Жесткий фикс контейнера кастомного курсора */
         #trail-container {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none; /* Чтобы точки не блокировали клики по кнопкам */
-            z-index: 99999;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999999;
         }
 
-        /* Точки шлейфа — теперь они видимы изначально */
+        /* Четкие физические параметры для точек шлейфа */
         .cursor-dot {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
-            width: 8px;
-            height: 8px;
-            background: #ffffff;
+            width: 10px;
+            height: 10px;
+            background-color: #ffffff !important;
             border-radius: 50%;
             pointer-events: none;
-            box-shadow: 0 0 12px #ffffff, 0 0 20px #ffffff;
+            box-shadow: 0 0 15px #ffffff, 0 0 30px #ffffff;
             will-change: transform;
-            transform: translate3d(-50%, -50%, 0);
-            display: block !important; /* Гарантия видимости */
+            transform: translate(-50%, -50%);
         }
 
         .container {
@@ -177,7 +176,7 @@
     </div>
 
     <script>
-        // 1. ДИНАМИЧЕСКИЙ СТАТУС СТРАНИЦЫ (ВКЛАДКИ)
+        // 1. АНИМАЦИЯ НАЗВАНИЯ ВКЛАДКИ
         const titles = ["мне", "нужен", "психолог"];
         let titleIndex = 0;
         setInterval(() => {
@@ -185,15 +184,12 @@
             document.title = titles[titleIndex];
         }, 3000);
 
-        // 2. ИСПРАВЛЕННЫЙ И ВСЕГДА ВИДИМЫЙ ШЛЕЙФ
-        const dotsCount = 6;
+        // 2. ИСПРАВЛЕННЫЙ ШЛЕЙФ КУРСОРA
+        const dotsCount = 5;
         const container = document.getElementById('trail-container');
         const dots = [];
         
-        // Сразу задаем дефолтные координаты в центре, чтобы шлейф отрисовался мгновенно
         let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-        let realMouseX = mouse.x;
-        let realMouseY = mouse.y;
         
         for (let i = 0; i < dotsCount; i++) {
             const dot = document.createElement('div');
@@ -203,23 +199,23 @@
         }
 
         window.addEventListener('mousemove', (e) => {
-            realMouseX = e.clientX;
-            realMouseY = e.clientY;
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
         });
 
         function animateDots() {
-            mouse.x += (realMouseX - mouse.x) * 0.35;
-            mouse.y += (realMouseY - mouse.y) * 0.35;
-
             let targetX = mouse.x;
             let targetY = mouse.y;
 
             dots.forEach((dot, index) => {
-                dot.x += (targetX - dot.x) * 0.35;
-                dot.y += (targetY - dot.y) * 0.35;
+                dot.x += (targetX - dot.x) * 0.3;
+                dot.y += (targetY - dot.y) * 0.3;
                 
-                dot.element.style.transform = `translate3d(${dot.x}px, ${dot.y}px, 0) translate(-50%, -50%) scale(${(1 - (index / dotsCount) * 0.6).toFixed(2)})`;
+                // Исправленный метод позиционирования через левые/верхние отступы для 100% совместимости
+                dot.element.style.left = dot.x + 'px';
+                dot.element.style.top = dot.y + 'px';
                 dot.element.style.opacity = (1 - (index / dotsCount)).toFixed(2);
+                dot.element.style.transform = `translate(-50%, -50%) scale(${(1 - (index / dotsCount) * 0.5).toFixed(2)})`;
                 
                 targetX = dot.x;
                 targetY = dot.y;
@@ -242,8 +238,8 @@
 
         dragTitle.addEventListener('mousedown', (e) => {
             isDragging = true;
-            startMouseX = realMouseX - currentX;
-            startMouseY = realMouseY - currentY;
+            startMouseX = mouse.x - currentX;
+            startMouseY = mouse.y - currentY;
             dragTitle.style.transition = 'none';
         });
 
@@ -282,3 +278,10 @@
 
             dragTitle.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) skewX(${skewX}deg) rotateY(${rotateY}deg)`;
             
+            requestAnimationFrame(updatePhysics);
+        }
+        updatePhysics();
+
+        // 4. ЖЕЛЕ ДЛЯ КНОПОК ПРИ УХОДЕ КУРСОРA
+        const cards = document.querySelectorAll('.link-card');
+        cards.forEach(card => {
