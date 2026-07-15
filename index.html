@@ -17,7 +17,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            cursor: none;
+            cursor: none; /* Полностью скрываем дефолтную мышь */
         }
 
         body {
@@ -33,19 +33,20 @@
             overflow-x: hidden;
         }
 
-        #cursor-trail {
+        /* Элементы аккуратного шлейфа */
+        .cursor-dot {
             position: fixed;
             top: 0;
             left: 0;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background: #ffffff;
             border-radius: 50%;
             pointer-events: none;
             z-index: 9999;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 15px #ffffff, 0 0 30px #ffffff;
-            transition: transform 0.06s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 0 12px #ffffff;
+            will-change: transform;
         }
 
         .container {
@@ -61,7 +62,7 @@
             margin-bottom: 60px; 
         }
 
-        /* Чистый стеклянный текст без ущербной обводки */
+        /* Текст переливается точно так же, как и кнопки */
         .profile h1 {
             font-family: 'Unbounded', sans-serif;
             font-weight: 900;
@@ -69,20 +70,19 @@
             letter-spacing: -3px;
             text-transform: uppercase;
             
-            /* Настоящий стеклянный полупрозрачный градиент */
+            /* Перелив как на кнопках */
             color: transparent;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.15) 100%);
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.9) 0%, 
+                rgba(120, 120, 120, 0.4) 50%, 
+                rgba(255, 255, 255, 0.9) 100%
+            );
+            background-size: 200% 200%;
             -webkit-background-clip: text;
             background-clip: text;
             
+            animation: wave-shift 6s ease infinite;
             filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8));
-            animation: glass-shimmer 4s ease-in-out infinite alternate;
-        }
-
-        @keyframes glass-shimmer {
-            0% { filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)) brightness(0.9); }
-            50% { filter: drop-shadow(0 6px 20px rgba(255,255,255,0.1)) brightness(1.1); }
-            100% { filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)) brightness(1.0); }
         }
 
         .links-group {
@@ -119,6 +119,7 @@
             will-change: transform;
         }
 
+        /* Общая анимация перелива для текста и кнопок */
         @keyframes wave-shift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -136,7 +137,8 @@
 </head>
 <body>
 
-    <div id="cursor-trail"></div>
+    <!-- Контейнер для точек аккуратного шлейфа -->
+    <div id="trail-container"></div>
 
     <div class="container">
         
@@ -157,31 +159,65 @@
     </div>
 
     <script>
-        const trail = document.getElementById('cursor-trail');
-        let mouseX = 0, mouseY = 0;
+        // Скрипт плавного аккуратного шлейфа (мышь + хвост из 5 точек)
+        const dotsCount = 5;
+        const container = document.getElementById('trail-container');
+        const dots = [];
         
+        let mouse = { x: 0, y: 0 };
+        
+        // Создаем точки шлейфа с уменьшением размера и прозрачности к концу хвоста
+        for (let i = 0; i < dotsCount; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'cursor-dot';
+            dot.style.opacity = (1 - (i / dotsCount)).toFixed(2);
+            dot.style.transform = `translate(-50%, -50%) scale(${(1 - (i / dotsCount) * 0.5).toFixed(2)})`;
+            container.appendChild(dot);
+            dots.push({ element: dot, x: 0, y: 0 });
+        }
+
         window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            trail.style.left = mouseX + 'px';
-            trail.style.top = mouseY + 'px';
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
         });
 
+        // Функция плавной интерполяции хвоста
+        function animateDots() {
+            let targetX = mouse.x;
+            let targetY = mouse.y;
+
+            dots.forEach((dot, index) => {
+                // Каждая следующая точка стремится к предыдущей с задержкой
+                dot.x += (targetX - dot.x) * 0.35;
+                dot.y += (targetY - dot.y) * 0.35;
+                
+                dot.element.style.left = dot.x + 'px';
+                dot.element.style.top = dot.y + 'px';
+                
+                targetX = dot.x;
+                targetY = dot.y;
+            });
+
+            requestAnimationFrame(animateDots);
+        }
+        animateDots();
+
+        // Физика желе для кнопок при уходе курсора
         const cards = document.querySelectorAll('.link-card');
         cards.forEach(card => {
-            card.addEventListener('mouseleave', (e) => {
+            card.addEventListener('mouseleave', () => {
                 const rect = card.getBoundingClientRect();
                 const cardCenterX = rect.left + rect.width / 2;
                 const cardCenterY = rect.top + rect.height / 2;
                 
-                const deltaX = mouseX - cardCenterX;
-                const deltaY = mouseY - cardCenterY;
+                const deltaX = mouse.x - cardCenterX;
+                const deltaY = mouse.y - cardCenterY;
                 
-                const tiltX = (deltaY / rect.height) * 15;
-                const tiltY = -(deltaX / rect.width) * 15;
+                const tiltX = (deltaY / rect.height) * 12;
+                const tiltY = -(deltaX / rect.width) * 12;
                 
                 card.style.transition = 'transform 0.1s ease-out';
-                card.style.transform = `scale(0.96) skew(${tiltY * 0.3}deg) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+                card.style.transform = `scale(0.96) skew(${tiltY * 0.2}deg) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
                 
                 setTimeout(() => {
                     card.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.2, 1.4)';
