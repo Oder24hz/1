@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oder24hz</title>
-    <!-- Подключаем ультра-жирный футуристичный шрифт для заголовка -->
+    <!-- Новый ультра-широкий и жирный шрифт -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
-    <link href="https://googleapis.com/css2?family=Syne:wght@800;900&display=swap" rel="stylesheet">
+    <link href="https://googleapis.com/css2?family=Unbounded:wght@900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-gif: url('https://i.pinimg.com/originals/10/ff/4f/10ff4f98a494e390e07b1a0e9eefa4be.gif');
@@ -46,7 +46,7 @@
             z-index: 9999;
             transform: translate(-50%, -50%);
             box-shadow: 0 0 15px #ffffff, 0 0 30px #ffffff;
-            transition: transform 0.08s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: transform 0.06s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .container {
@@ -62,46 +62,36 @@
             margin-bottom: 60px; 
         }
 
-        /* Огромный стеклянный заголовок с новым шрифтом */
+        /* Огромный прозрачный стеклянный текст */
         .profile h1 {
-            font-family: 'Syne', sans-serif;
-            font-weight: 900; /* Максимальная жирность */
-            font-size: 54px; /* Увеличенный размер */
-            letter-spacing: -2px;
+            font-family: 'Unbounded', sans-serif;
+            font-weight: 900;
+            font-size: 62px; /* Ещё больше */
+            letter-spacing: -3px;
             text-transform: uppercase;
             
-            /* Эффект матового стекла на тексте */
-            color: rgba(255, 255, 255, 0.85);
-            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3); /* Тонкий стеклянный контур */
+            /* Эффект прозрачного стекла сквозь текст */
+            color: transparent;
+            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.6);
+            background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+            -webkit-background-clip: text;
+            background-clip: text;
             
-            /* Плавное покачивание стеклянного блика */
-            animation: glass-glow 4s ease-in-out infinite alternate;
+            filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.7));
+            animation: glass-shimmer 4s ease-in-out infinite alternate;
         }
 
-        @keyframes glass-glow {
-            0% { 
-                text-shadow: 
-                    0 0 4px rgba(255,255,255,0.2), 
-                    0 4px 12px rgba(0,0,0,0.5); 
-            }
-            50% { 
-                text-shadow: 
-                    0 0 15px rgba(255,255,255,0.6), 
-                    0 0 25px rgba(255,255,255,0.3),
-                    0 8px 24px rgba(0,0,0,0.7); 
-                color: rgba(255, 255, 255, 0.95);
-            }
-            100% { 
-                text-shadow: 
-                    0 0 8px rgba(255,255,255,0.3), 
-                    0 4px 16px rgba(0,0,0,0.6); 
-            }
+        @keyframes glass-shimmer {
+            0% { filter: drop-shadow(0 4px 10px rgba(0,0,0,0.7)) brightness(0.9); }
+            50% { filter: drop-shadow(0 6px 20px rgba(255,255,255,0.2)) brightness(1.2); }
+            100% { filter: drop-shadow(0 4px 10px rgba(0,0,0,0.7)) brightness(1.0); }
         }
 
         .links-group {
             display: flex;
             flex-direction: column;
             gap: 18px;
+            perspective: 1000px; /* Для 3D желе-эффекта */
         }
 
         .link-card {
@@ -125,7 +115,11 @@
             background-size: 200% 200%;
             animation: wave-shift 6s ease infinite;
             backdrop-filter: blur(8px);
-            transition: all 0.4s ease;
+            
+            /* Плавный переход для ховера и возврата из желе */
+            transition: background 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            will-change: transform;
         }
 
         @keyframes wave-shift {
@@ -134,12 +128,13 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* Увеличение при наведении */
         .link-card:hover {
             background: #ffffff;
             color: #000000;
             border-color: #ffffff;
             box-shadow: 0 0 25px rgba(255, 255, 255, 0.35);
-            transform: translateY(-1px);
+            transform: scale(1.04); /* Кнопка увеличивается */
         }
     </style>
 </head>
@@ -158,7 +153,7 @@
             <a href="https://t.me" target="_blank" class="link-card">Telegram RealLife</a>
             <a href="https://twitch.tv" target="_blank" class="link-card">Twitch</a>
             <a href="https://youtube.com" target="_blank" class="link-card">Youtube</a>
-            <a href="https://discord.gg" class="link-card">Discord</a>
+            <a href="https://discord.gg" target="_blank" class="link-card">Discord</a>
             <a href="https://t.me" target="_blank" class="link-card">Reviews</a>
             <a href="https://t.me" target="_blank" class="link-card">Contact Account</a>
         </div>
@@ -166,10 +161,45 @@
     </div>
 
     <script>
+        // Движение точки за курсором
         const trail = document.getElementById('cursor-trail');
+        let mouseX = 0, mouseY = 0;
+        
         window.addEventListener('mousemove', (e) => {
-            trail.style.left = e.clientX + 'px';
-            trail.style.top = e.clientY + 'px';
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            trail.style.left = mouseX + 'px';
+            trail.style.top = mouseY + 'px';
+        });
+
+        // Скрипт интерактивного Желе-эффекта при уходе курсора
+        const cards = document.querySelectorAll('.link-card');
+        
+        cards.forEach(card => {
+            card.addEventListener('mouseleave', (e) => {
+                const rect = card.getBoundingClientRect();
+                
+                // Вычисляем, в какую сторону ушел курсор относительно центра кнопки
+                const cardCenterX = rect.left + rect.width / 2;
+                const cardCenterY = rect.top + rect.height / 2;
+                
+                const deltaX = mouseX - cardCenterX;
+                const deltaY = mouseY - cardCenterY;
+                
+                // Переводим смещение в небольшие градусы наклона и растяжения
+                const tiltX = (deltaY / rect.height) * 15;
+                const tiltY = -(deltaX / rect.width) * 15;
+                
+                // Применяем резкий толчок-растяжение вслед за мышкой
+                card.style.transition = 'transform 0.1s ease-out';
+                card.style.transform = `scale(0.96) skew(${tiltY * 0.3}deg) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+                
+                // Плавно возвращаем кнопку в исходное состояние (эффект затухания желе)
+                setTimeout(() => {
+                    card.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.2, 1.4)';
+                    card.style.transform = 'scale(1) skew(0deg) rotateX(0deg) rotateY(0deg)';
+                }, 100);
+            });
         });
     </script>
 </body>
