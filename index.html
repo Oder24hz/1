@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oder24hz</title>
-    <link rel="preconnect" href="https://googleapis.com">
-    <link rel="preconnect" href="https://gstatic.com" crossorigin>
-    <link href="https://googleapis.com/css2?family=Unbounded:wght@900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-gif: url('https://i.pinimg.com/originals/31/f0/cb/31f0cbbfe52091e54b2f8157ebd60a8f.gif');
@@ -17,7 +17,11 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            cursor: none; /* Полностью скрываем дефолтную мышь */
+            cursor: none !important; /* Полностью убираем дефолтную мышь везде */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none; /* Запрет выделения */
         }
 
         body {
@@ -30,23 +34,34 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
-        /* Элементы аккуратного шлейфа */
+        /* Полный фикс видимости шлейфа поверх backdrop-filter размытия */
+        #trail-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 99999999 !important;
+            isolation: isolate;
+        }
+
         .cursor-dot {
             position: fixed;
             top: 0;
             left: 0;
-            width: 8px;
-            height: 8px;
-            background: #ffffff;
+            width: 10px;
+            height: 10px;
+            background: #ffffff !important;
             border-radius: 50%;
             pointer-events: none;
-            z-index: 9999;
+            z-index: 99999999 !important;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 12px #ffffff;
-            will-change: transform;
+            box-shadow: 0 0 15px #ffffff, 0 0 25px #ffffff;
+            will-change: left, top;
         }
 
         .container {
@@ -60,17 +75,18 @@
 
         .profile {
             margin-bottom: 60px; 
+            display: inline-block;
+            width: 100%;
         }
 
-        /* Текст переливается точно так же, как и кнопки */
         .profile h1 {
             font-family: 'Unbounded', sans-serif;
             font-weight: 900;
             font-size: 62px;
             letter-spacing: -3px;
             text-transform: uppercase;
+            display: inline-block;
             
-            /* Перелив как на кнопках */
             color: transparent;
             background: linear-gradient(135deg, 
                 rgba(255, 255, 255, 0.9) 0%, 
@@ -83,6 +99,8 @@
             
             animation: wave-shift 6s ease infinite;
             filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8));
+            will-change: transform;
+            transform-origin: center center;
         }
 
         .links-group {
@@ -119,7 +137,6 @@
             will-change: transform;
         }
 
-        /* Общая анимация перелива для текста и кнопок */
         @keyframes wave-shift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -137,13 +154,12 @@
 </head>
 <body>
 
-    <!-- Контейнер для точек аккуратного шлейфа -->
     <div id="trail-container"></div>
 
     <div class="container">
         
         <div class="profile">
-            <h1>Oder24hz</h1>
+            <h1 id="drag-title">Oder24hz</h1>
         </div>
 
         <div class="links-group">
@@ -159,21 +175,26 @@
     </div>
 
     <script>
-        // Скрипт плавного аккуратного шлейфа (мышь + хвост из 5 точек)
+        // 1. АНИМАЦИЯ СМЕНЫ НАЗВАНИЯ ВКЛАДКИ (ИНТЕРВАЛ 3 СЕКУНДЫ)
+        const titles = ["мне", "нужен", "психолог"];
+        let titleIndex = 0;
+        setInterval(() => {
+            titleIndex = (titleIndex + 1) % titles.length;
+            document.title = titles[titleIndex];
+        }, 3000);
+
+        // 2. РАБОЧИЙ ШЛЕЙФ КУРСОРA
         const dotsCount = 5;
         const container = document.getElementById('trail-container');
         const dots = [];
         
-        let mouse = { x: 0, y: 0 };
+        let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
         
-        // Создаем точки шлейфа с уменьшением размера и прозрачности к концу хвоста
         for (let i = 0; i < dotsCount; i++) {
             const dot = document.createElement('div');
             dot.className = 'cursor-dot';
-            dot.style.opacity = (1 - (i / dotsCount)).toFixed(2);
-            dot.style.transform = `translate(-50%, -50%) scale(${(1 - (i / dotsCount) * 0.5).toFixed(2)})`;
             container.appendChild(dot);
-            dots.push({ element: dot, x: 0, y: 0 });
+            dots.push({ element: dot, x: mouse.x, y: mouse.y });
         }
 
         window.addEventListener('mousemove', (e) => {
@@ -181,18 +202,18 @@
             mouse.y = e.clientY;
         });
 
-        // Функция плавной интерполяции хвоста
         function animateDots() {
             let targetX = mouse.x;
             let targetY = mouse.y;
 
             dots.forEach((dot, index) => {
-                // Каждая следующая точка стремится к предыдущей с задержкой
-                dot.x += (targetX - dot.x) * 0.35;
-                dot.y += (targetY - dot.y) * 0.35;
+                dot.x += (targetX - dot.x) * 0.25;
+                dot.y += (targetY - dot.y) * 0.25;
                 
                 dot.element.style.left = dot.x + 'px';
                 dot.element.style.top = dot.y + 'px';
+                dot.element.style.opacity = (1 - (index / dotsCount)).toFixed(2);
+                dot.element.style.transform = `translate(-50%, -50%) scale(${(1 - (index / dotsCount) * 0.4).toFixed(2)})`;
                 
                 targetX = dot.x;
                 targetY = dot.y;
@@ -202,29 +223,67 @@
         }
         animateDots();
 
-        // Физика желе для кнопок при уходе курсора
+        // 3. ЖЕЛЕ-ЗАГОЛОВОК (DRAG + SPRING)
+        const dragTitle = document.getElementById('drag-title');
+        let isDragging = false;
+        let startMouseX = 0, startMouseY = 0;
+        let currentX = 0, currentY = 0;
+        let targetX = 0, targetY = 0;
+        let vx = 0, vy = 0;
+        
+        const spring = 0.12; 
+        const friction = 0.82;
+
+        dragTitle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startMouseX = mouse.x - currentX;
+            startMouseY = mouse.y - currentY;
+            dragTitle.style.transition = 'none';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const rawX = e.clientX - startMouseX;
+            const rawY = e.clientY - startMouseY;
+            targetX = rawX * 0.65; 
+            targetY = rawY * 0.65;
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            targetX = 0;
+            targetY = 0;
+        });
+
+        function updatePhysics() {
+            if (!isDragging) {
+                let ax = (targetX - currentX) * spring;
+                let ay = (targetY - currentY) * spring;
+                vx += ax;
+                vy += ay;
+                vx *= friction;
+                vy *= friction;
+                currentX += vx;
+                currentY += vy;
+            } else {
+                currentX += (targetX - currentX) * 0.3;
+                currentY += (targetY - currentY) * 0.3;
+            }
+
+            const skewX = isDragging ? (targetX - currentX) * 0.1 : vx * 0.4;
+            const rotateY = isDragging ? (targetX - currentX) * 0.05 : vx * 0.2;
+
+            dragTitle.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) skewX(${skewX}deg) rotateY(${rotateY}deg)`;
+            
+            requestAnimationFrame(updatePhysics);
+        }
+        updatePhysics();
+
+        // 4. ЖЕЛЕ ДЛЯ КНОПОК ПРИ УХОДЕ КУРСОРA
         const cards = document.querySelectorAll('.link-card');
         cards.forEach(card => {
             card.addEventListener('mouseleave', () => {
                 const rect = card.getBoundingClientRect();
                 const cardCenterX = rect.left + rect.width / 2;
                 const cardCenterY = rect.top + rect.height / 2;
-                
-                const deltaX = mouse.x - cardCenterX;
-                const deltaY = mouse.y - cardCenterY;
-                
-                const tiltX = (deltaY / rect.height) * 12;
-                const tiltY = -(deltaX / rect.width) * 12;
-                
-                card.style.transition = 'transform 0.1s ease-out';
-                card.style.transform = `scale(0.96) skew(${tiltY * 0.2}deg) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-                
-                setTimeout(() => {
-                    card.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.2, 1.4)';
-                    card.style.transform = 'scale(1) skew(0deg) rotateX(0deg) rotateY(0deg)';
-                }, 100);
-            });
-        });
-    </script>
-</body>
-</html>
