@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oder24hz</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Unbounded:wght@900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-gif: url('https://i.pinimg.com/originals/31/f0/cb/31f0cbbfe52091e54b2f8157ebd60a8f.gif');
+            --bg-gif: url('https://pinimg.com');
             --text-main: #FFFFFF;
         }
 
@@ -17,11 +17,11 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            cursor: none !important; /* Полностью убираем дефолтную мышь везде */
+            cursor: none !important; /* Скрываем дефолтный курсор намертво */
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
-            user-select: none; /* Запрет выделения */
+            user-select: none; /* Запрет выделения текста */
         }
 
         body {
@@ -37,7 +37,7 @@
             overflow: hidden;
         }
 
-        /* Полный фикс видимости шлейфа поверх backdrop-filter размытия */
+        /* Выносим кастомный курсор на самый верхний изолированный слой */
         #trail-container {
             position: fixed;
             top: 0;
@@ -75,8 +75,6 @@
 
         .profile {
             margin-bottom: 60px; 
-            display: inline-block;
-            width: 100%;
         }
 
         .profile h1 {
@@ -85,7 +83,6 @@
             font-size: 62px;
             letter-spacing: -3px;
             text-transform: uppercase;
-            display: inline-block;
             
             color: transparent;
             background: linear-gradient(135deg, 
@@ -99,8 +96,6 @@
             
             animation: wave-shift 6s ease infinite;
             filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8));
-            will-change: transform;
-            transform-origin: center center;
         }
 
         .links-group {
@@ -159,7 +154,7 @@
     <div class="container">
         
         <div class="profile">
-            <h1 id="drag-title">Oder24hz</h1>
+            <h1>Oder24hz</h1>
         </div>
 
         <div class="links-group">
@@ -194,6 +189,7 @@
             const dot = document.createElement('div');
             dot.className = 'cursor-dot';
             container.appendChild(dot);
+            // Добавили x и y свойства объектам в массиве, чтобы убрать ошибку NaN
             dots.push({ element: dot, x: mouse.x, y: mouse.y });
         }
 
@@ -223,67 +219,29 @@
         }
         animateDots();
 
-        // 3. ЖЕЛЕ-ЗАГОЛОВОК (DRAG + SPRING)
-        const dragTitle = document.getElementById('drag-title');
-        let isDragging = false;
-        let startMouseX = 0, startMouseY = 0;
-        let currentX = 0, currentY = 0;
-        let targetX = 0, targetY = 0;
-        let vx = 0, vy = 0;
-        
-        const spring = 0.12; 
-        const friction = 0.82;
-
-        dragTitle.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            startMouseX = mouse.x - currentX;
-            startMouseY = mouse.y - currentY;
-            dragTitle.style.transition = 'none';
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            const rawX = e.clientX - startMouseX;
-            const rawY = e.clientY - startMouseY;
-            targetX = rawX * 0.65; 
-            targetY = rawY * 0.65;
-        });
-
-        window.addEventListener('mouseup', () => {
-            if (!isDragging) return;
-            isDragging = false;
-            targetX = 0;
-            targetY = 0;
-        });
-
-        function updatePhysics() {
-            if (!isDragging) {
-                let ax = (targetX - currentX) * spring;
-                let ay = (targetY - currentY) * spring;
-                vx += ax;
-                vy += ay;
-                vx *= friction;
-                vy *= friction;
-                currentX += vx;
-                currentY += vy;
-            } else {
-                currentX += (targetX - currentX) * 0.3;
-                currentY += (targetY - currentY) * 0.3;
-            }
-
-            const skewX = isDragging ? (targetX - currentX) * 0.1 : vx * 0.4;
-            const rotateY = isDragging ? (targetX - currentX) * 0.05 : vx * 0.2;
-
-            dragTitle.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) skewX(${skewX}deg) rotateY(${rotateY}deg)`;
-            
-            requestAnimationFrame(updatePhysics);
-        }
-        updatePhysics();
-
-        // 4. ЖЕЛЕ ДЛЯ КНОПОК ПРИ УХОДЕ КУРСОРA
+        // 3. ЖЕЛЕ ДЛЯ КНОПОК ПРИ УХОДЕ КУРСОРA
         const cards = document.querySelectorAll('.link-card');
         cards.forEach(card => {
             card.addEventListener('mouseleave', () => {
                 const rect = card.getBoundingClientRect();
                 const cardCenterX = rect.left + rect.width / 2;
                 const cardCenterY = rect.top + rect.height / 2;
+                
+                const deltaX = mouse.x - cardCenterX;
+                const deltaY = mouse.y - cardCenterY;
+                
+                const tiltX = (deltaY / rect.height) * 12;
+                const tiltY = -(deltaX / rect.width) * 12;
+                
+                card.style.transition = 'transform 0.1s ease-out';
+                card.style.transform = `scale(0.96) skew(${tiltY * 0.2}deg) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+                
+                setTimeout(() => {
+                    card.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.2, 1.4)';
+                    card.style.transform = 'scale(1) skew(0deg) rotateX(0deg) rotateY(0deg)';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
