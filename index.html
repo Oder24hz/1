@@ -9,7 +9,7 @@
     <link href="https://googleapis.com/css2?family=Unbounded:wght@900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-gif: url('https://i.pinimg.com/originals/31/f0/cb/31f0cbbfe52091e54b2f8157ebd60a8f.gif');
+            --bg-gif: url('https://i.pinimg.com/originals/19/98/85/1998852c1087efcbd34d2fc1893d9a2a.gif');
             --text-main: #FFFFFF;
         }
 
@@ -17,8 +17,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            cursor: none; 
-            /* Полный запрет на выделение любого текста на сайте */
+            cursor: none !important; /* Полное жесткое отключение дефолтного курсора везде */
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
@@ -38,18 +37,30 @@
             overflow: hidden;
         }
 
-        /* Пофиксили баг курсора с помощью pointer-events: none */
-        .cursor-dot {
+        /* Оболочка для кастомного курсора */
+        #trail-container {
             position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 99999;
+        }
+
+        /* Точки шлейфа */
+        .cursor-dot {
+            position: absolute;
             top: 0;
             left: 0;
             width: 8px;
             height: 8px;
             background: #ffffff;
             border-radius: 50%;
-            pointer-events: none; /* Точки шлейфа больше не ломают клики */
-            z-index: 9999;
+            pointer-events: none;
+            box-shadow: 0 0 12px #ffffff, 0 0 20px #ffffff;
             will-change: transform;
+            transform: translate3d(-50%, -50%, 0);
         }
 
         .container {
@@ -61,14 +72,12 @@
             padding-bottom: 40px;
         }
 
-        /* Контейнер для физики желе на заголовке */
         .profile {
             margin-bottom: 60px; 
             display: inline-block;
             width: 100%;
         }
 
-        /* Интерактивный интерактивный заголовок */
         .profile h1 {
             font-family: 'Unbounded', sans-serif;
             font-weight: 900;
@@ -145,6 +154,7 @@
 </head>
 <body>
 
+    <!-- Исправленный контейнер кастомного курсора -->
     <div id="trail-container"></div>
 
     <div class="container">
@@ -172,36 +182,51 @@
         setInterval(() => {
             titleIndex = (titleIndex + 1) % titles.length;
             document.title = titles[titleIndex];
-        }, 3000); // Смена слов каждые 3 секунды (медленно)
+        }, 3000);
 
-        // 2. ИСПРАВЛЕННЫЙ ШЛЕЙФ КУРСОРA
-        const dotsCount = 5;
+        // 2. ИСПРАВЛЕННЫЙ ШЛЕЙФ КУРСОРA (ИНЕРЦИЯ И ВИДИМОСТЬ С ПЕРВОГО КАДРА)
+        const dotsCount = 6;
         const container = document.getElementById('trail-container');
         const dots = [];
+        
+        // Стартуем из центра экрана, чтобы курсор не «прятался» на старте
         let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+        let realMouseX = mouse.x;
+        let realMouseY = mouse.y;
+        let hasMoved = false;
         
         for (let i = 0; i < dotsCount; i++) {
             const dot = document.createElement('div');
             dot.className = 'cursor-dot';
+            // Скрываем, пока пользователь не двинул мышкой
+            dot.style.display = 'none'; 
             container.appendChild(dot);
             dots.push({ element: dot, x: mouse.x, y: mouse.y });
         }
 
         window.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
+            if (!hasMoved) {
+                hasMoved = true;
+                // Активируем видимость при первом шевелении мыши
+                dots.forEach(d => d.element.style.display = 'block');
+            }
+            realMouseX = e.clientX;
+            realMouseY = e.clientY;
         });
 
         function animateDots() {
+            // Плавное следование за реальной позицией
+            mouse.x += (realMouseX - mouse.x) * 0.4;
+            mouse.y += (realMouseY - mouse.y) * 0.4;
+
             let targetX = mouse.x;
             let targetY = mouse.y;
 
             dots.forEach((dot, index) => {
-                dot.x += (targetX - dot.x) * 0.35;
-                dot.y += (targetY - dot.y) * 0.35;
+                dot.x += (targetX - dot.x) * 0.4;
+                dot.y += (targetY - dot.y) * 0.4;
                 
-                // Используем transform для идеальной плавности без багов позиционирования
-                dot.element.style.transform = `translate3d(${dot.x}px, ${dot.y}px, 0) translate(-50%, -50%) scale(${(1 - (index / dotsCount) * 0.5).toFixed(2)})`;
+                dot.element.style.transform = `translate3d(${dot.x}px, ${dot.y}px, 0) translate(-50%, -50%) scale(${(1 - (index / dotsCount) * 0.6).toFixed(2)})`;
                 dot.element.style.opacity = (1 - (index / dotsCount)).toFixed(2);
                 
                 targetX = dot.x;
@@ -212,7 +237,7 @@
         }
         animateDots();
 
-        // 3. ФИЗИКА ТЯНУЩЕГОСЯ ЖЕЛЕ-ЗАГОЛОВКА (DRAG & SPRING)
+        // 3. ФИЗИКА ТЯНУЩЕГОСЯ ЖЕЛЕ-ЗАГОЛОВКА
         const dragTitle = document.getElementById('drag-title');
         let isDragging = false;
         let startMouseX = 0, startMouseY = 0;
@@ -220,20 +245,18 @@
         let targetX = 0, targetY = 0;
         let vx = 0, vy = 0;
         
-        // Параметры жесткости пружины желе
         const spring = 0.12; 
         const friction = 0.82;
 
         dragTitle.addEventListener('mousedown', (e) => {
             isDragging = true;
-            startMouseX = e.clientX - currentX;
-            startMouseY = e.clientY - currentY;
+            startMouseX = realMouseX - currentX;
+            startMouseY = realMouseY - currentY;
             dragTitle.style.transition = 'none';
         });
 
         window.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
-            // Рассчитываем физическое растяжение с эффектом сопротивления (чем дальше тянешь, тем тяжелее)
             const rawX = e.clientX - startMouseX;
             const rawY = e.clientY - startMouseY;
             
@@ -244,34 +267,22 @@
         window.addEventListener('mouseup', () => {
             if (!isDragging) return;
             isDragging = false;
-            // Цель для пружины — вернуться в исходную точку 0,0
             targetX = 0;
             targetY = 0;
         });
 
-        // Физический движок для пружинного возврата и искажения желе
         function updatePhysics() {
             if (!isDragging) {
-                // Сила пружины
                 let ax = (targetX - currentX) * spring;
                 let ay = (targetY - currentY) * spring;
-                
                 vx += ax;
                 vy += ay;
                 vx *= friction;
                 vy *= friction;
-                
                 currentX += vx;
                 currentY += vy;
             } else {
-                // Плавное следование за мышкой во время перетаскивания
                 currentX += (targetX - currentX) * 0.3;
                 currentY += (targetY - currentY) * 0.3;
             }
 
-            // Динамический перекос (skew) и наклон в зависимости от скорости движения/растяжения
-            const skewX = isDragging ? (targetX - currentX) * 0.1 : vx * 0.4;
-            const rotateY = isDragging ? (targetX - currentX) * 0.05 : vx * 0.2;
-
-            dragTitle.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) skewX(${skewX}deg) rotateY(${rotateY}deg)`;
-            
