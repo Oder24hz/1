@@ -7,9 +7,7 @@
     <style>
         :root {
             --bg-gif: url('https://i.pinimg.com/originals/10/ff/4f/10ff4f98a494e390e07b1a0e9eefa4be.gif');
-            --card-bg: rgba(15, 15, 15, 0.4); 
             --text-main: #FFFFFF;
-            --neon-glow: #ffffff;
         }
 
         * {
@@ -80,67 +78,51 @@
             gap: 18px;
         }
 
-        .link-wrapper {
-            position: relative;
-            width: 100%;
-            height: 60px; 
-            display: block;
-            text-decoration: none;
-        }
-
-        .border-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            filter: drop-shadow(0 0 4px var(--neon-glow)) drop-shadow(0 0 10px var(--neon-glow));
-        }
-
-        .border-path {
-            fill: none;
-            stroke: #ffffff;
-            stroke-width: 2px;
-            /* Ровно одна сплошная линия (длина 150px, пустота 870px) */
-            stroke-dasharray: 150 870; 
-            stroke-dashoffset: 0;
-            /* Время анимации увеличено до 8 секунд для максимальной плавности и медленного бега */
-            animation: run-border-smooth 8s linear infinite;
-        }
-
-        @keyframes run-border-smooth {
-            to {
-                stroke-dashoffset: -1020; /* Полный точный круг без рывков на углах */
-            }
-        }
-
+        /* Полностью квадратная кнопка с ИИ-переливом фона */
         .link-card {
             width: 100%;
-            height: 100%;
-            background-color: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            height: 60px;
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+            text-decoration: none;
             color: var(--text-main);
             font-size: 16px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: all 0.3s ease;
-            display: flex;
-            justify-content: center; 
-            align-items: center;
+            
+            /* Тонкая стильная граница */
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            
+            /* Живой переливающийся градиент за счет увеличения размера фона в 2 раза */
+            background: linear-gradient(135deg, 
+                rgba(20, 20, 20, 0.5) 0%, 
+                rgba(45, 45, 45, 0.4) 50%, 
+                rgba(20, 20, 20, 0.5) 100%
+            );
+            background-size: 200% 200%;
+            
+            /* Супер-плавное бесконечное движение волны */
+            animation: wave-shift 6s ease infinite;
+            
             backdrop-filter: blur(8px);
+            transition: all 0.4s ease;
         }
 
-        /* Эффект наведения */
-        .link-wrapper:hover .link-card {
-            background-color: #ffffff;
+        /* Плавная анимация движения жидкого градиента */
+        @keyframes wave-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Мягкая и стильная реакция на ховер */
+        .link-card:hover {
+            background: #ffffff;
             color: #000000;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
-        }
-
-        .link-wrapper:hover .border-path {
-            animation: run-border-smooth 3s linear infinite; /* Ускорение движения при наведении */
-            stroke-dasharray: 250 770; /* Линия удлиняется при ховере */
+            border-color: #ffffff;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.35);
+            transform: translateY(-1px);
         }
     </style>
 </head>
@@ -155,54 +137,13 @@
         </div>
 
         <div class="links-group">
-            <a href="https://t.me/Oderrr" target="_blank" class="link-wrapper">
-                <svg class="border-svg" viewBox="0 0 450 60" preserveAspectRatio="none">
-                    <path class="border-path" d="M 1,1 L 449,1 L 449,59 L 1,59 Z"></path>
-                </svg>
-                <div class="link-card">Telegram Channel</div>
-            </a>
-            
-            <a href="https://t.me/OderRealLife" target="_blank" class="link-wrapper">
-                <svg class="border-svg" viewBox="0 0 450 60" preserveAspectRatio="none">
-                    <path class="border-path" d="M 1,1 L 449,1 L 449,59 L 1,59 Z"></path>
-                </svg>
-                <div class="link-card">Telegram RealLife</div>
-            </a>
-            
-            <a href="https://www.twitch.tv/oder24hz" target="_blank" class="link-wrapper">
-                <svg class="border-svg" viewBox="0 0 450 60" preserveAspectRatio="none">
-                    <path class="border-path" d="M 1,1 L 449,1 L 449,59 L 1,59 Z"></path>
-                </svg>
-                <div class="link-card">Twitch</div>
-            </a>
-            
-            <a href="https://www.youtube.com/@Oder24hz" target="_blank" class="link-wrapper">
-                <svg class="border-svg" viewBox="0 0 450 60" preserveAspectRatio="none">
-                    <path class="border-path" d="M 1,1 L 449,1 L 449,59 L 1,59 Z"></path>
-                </svg>
-                <div class="link-card">Youtube</div>
-            </a>
-            
-            <a href="https://discord.gg/pMc7SFH8qX" target="_blank" class="link-wrapper">
-                <svg class="border-svg" viewBox="0 0 450 60" preserveAspectRatio="none">
-                    <path class="border-path" d="M 1,1 L 449,1 L 449,59 L 1,59 Z"></path>
-                </svg>
-                <div class="link-card">Discord</div>
-            </a>
-            
-            <a href="https://t.me/Oder_optim" target="_blank" class="link-wrapper">
-                <svg class="border-svg" viewBox="0 0 450 60" preserveAspectRatio="none">
-                    <path class="border-path" d="M 1,1 L 449,1 L 449,59 L 1,59 Z"></path>
-                </svg>
-                <div class="link-card">Reviews</div>
-            </a>
-            
-            <a href="https://t.me/OderOptimization" target="_blank" class="link-wrapper">
-                <svg class="border-svg" viewBox="0 0 450 60" preserveAspectRatio="none">
-                    <path class="border-path" d="M 1,1 L 449,1 L 449,59 L 1,59 Z"></path>
-                </svg>
-                <div class="link-card">Contact Account</div>
-            </a>
+            <a href="https://t.me" target="_blank" class="link-card">Telegram Channel</a>
+            <a href="https://t.me" target="_blank" class="link-card">Telegram RealLife</a>
+            <a href="https://twitch.tv" target="_blank" class="link-card">Twitch</a>
+            <a href="https://youtube.com" target="_blank" class="link-card">Youtube</a>
+            <a href="https://discord.gg" target="_blank" class="link-card">Discord</a>
+            <a href="https://t.me" target="_blank" class="link-card">Reviews</a>
+            <a href="https://t.me" target="_blank" class="link-card">Contact Account</a>
         </div>
 
     </div>
